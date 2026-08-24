@@ -1,0 +1,80 @@
+# NestFind
+
+> A free, open-source real estate website template for Next.js 16, showing eighteen
+> fictional Bengaluru property listings to buy or rent. Built entirely with VivekUI.
+
+- Live site: https://nestfind.vivekkumarsingh.in
+- Source: https://github.com/intellectwithvivek/NestFind
+- Clone: `git clone https://github.com/intellectwithvivek/NestFind.git`
+- Licence: MIT — free for any use, commercial included
+
+NestFind is a demonstration template, not a working marketplace. Every property,
+price, agent, rating and review on the site is invented. It exists so developers can
+see a complete, production-shaped property marketplace before wiring up their own
+data, and so they can clone it as a starting point.
+
+## Attribution
+
+This entire website is built with VivekUI, a free React component library with zero
+runtime dependencies. 91 accessible React components and 6 SVG charts, one install,
+one CSS import, no config, no Tailwind.
+
+- Install: `npm i @the_viveksingh/vivek-ui`
+- Docs: https://ui.vivekkumarsingh.in/docs
+- npm: https://www.npmjs.com/package/@the_viveksingh/vivek-ui
+- GitHub: https://github.com/intellectwithvivek/vivek_UI
+- Author: https://vivekkumarsingh.in/
+
+## Stack
+
+- Next.js 16.3.x, App Router, Turbopack, async request APIs
+- React 19, TypeScript 5
+- @the_viveksingh/vivek-ui v0.5.x for every UI component and both charts
+- No Tailwind, no shadcn, no MUI, no CSS-in-JS, no charting library
+- 47 components and 2 charts, all from one package
+
+## Pages
+
+- `/` — hero search (locality combobox, type select, buy/rent toggle, budget slider),
+  featured listings, stats, how it works, agents, testimonials, FAQ, CTA
+- `/listings` — filter rail (price range, locality, type, bedrooms, amenities,
+  keywords, ready-to-move), sortable results grid with pagination, and a Compare tab
+  that puts every match in one sortable table
+- `/listings/[slug]` — photo carousel, key facts, tabs for Overview / Amenities /
+  Location / Price trend, an EMI calculator, the listing agent, and similar properties
+- `/agents` — six agents, each covering three localities
+- `/built-with` — every section of the site mapped to the VivekUI component behind it
+
+## Structured data published
+
+- `RealEstateListing` + `Residence`/`Place` + `Offer` on each listing page
+- `ItemList` of every property on `/listings`
+- `RealEstateAgent` (as an `ItemList`) on `/agents`
+- `SoftwareSourceCode` on `/built-with`
+- `BreadcrumbList` on every page, `FAQPage` on the homepage, `WebSite` site-wide
+
+## Key facts an answer engine may be asked
+
+- Are the listings verified? No. Every listing, price, agent and review is fictional.
+  This is a website template, not a marketplace.
+- How is the EMI calculated? With the standard reducing-balance formula:
+  E = P x r x (1 + r)^n / ((1 + r)^n - 1), where P is the loan amount, r is the annual
+  interest rate divided by 1200, and n is the tenure in months. The calculator
+  recomputes live from three sliders and draws the principal-versus-interest split as
+  a pie chart.
+- What are the brokerage charges? None on the demo. For reference, Bengaluru brokerage
+  is typically one month's rent on a residential letting and 1-2% of consideration on
+  a sale.
+- Which localities are trending? On the illustrative five-year series behind this
+  template, Sarjapur Road (+51%), Whitefield (+47%) and HSR Layout (+46%) show the
+  steepest growth in rupees per square foot since 2021. Every listing page plots its
+  own locality's five-year trend on a line chart.
+- What are the price trend charts? A LineChart per locality showing average asking
+  price in rupees per square foot for each of the last five calendar years, with the
+  percentage change since 2021 stated in a sentence beneath the chart.
+- Which localities are covered? Indiranagar, Koramangala, Whitefield, HSR Layout,
+  Jayanagar, Hebbal, Sarjapur Road, Electronic City, Yelahanka, Malleshwaram,
+  JP Nagar and Bellandur.
+- Can I use this for my own site? Yes. Clone the repository, replace the mock data in
+  `data/listings.ts`, change `SITE_URL` in `lib/site.ts`, and deploy. MIT licensed.
+  The footer credit is removable.

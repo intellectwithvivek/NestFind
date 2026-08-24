@@ -1,26 +1,671 @@
-@import "tailwindcss";
+/*
+ * NestFind — site styles on top of VivekUI.
+ *
+ * Everything here is either a token override or a single flat `.nf-` class.
+ * VivekUI wraps every one of its own selectors in `:where()`, so specificity
+ * zero, so a plain class of ours always wins. There is no `!important` in
+ * this file and there does not need to be.
+ */
+
+/* ---------------------------------------------------------------- tokens */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Blue accent, pulled a shade deeper than the VivekUI default so it reads
+     as drafting ink rather than a system link. */
+  --vk-color-primary: #1257c9;
+  --vk-color-primary-hover: #0f4bad;
+  --vk-color-primary-active: #0d4098;
+  --vk-color-primary-subtle: #e8effc;
+  --vk-color-primary-subtle-fg: #0b3f96;
+  --vk-color-ring: #1257c9;
+
+  /* next/font sets --nf-font-* on <html>; point the library tokens at them so
+     every VivekUI component picks the typeface up without a per-component prop. */
+  --vk-font-sans:
+    var(--nf-font-sans), -apple-system, BlinkMacSystemFont, system-ui,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --vk-font-mono:
+    var(--nf-font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --vk-radius-sm: 3px;
+  --vk-radius-md: 5px;
+  --vk-radius-lg: 8px;
+  --vk-radius-xl: 12px;
+
+  /* The blueprint grid. Two line weights, the heavier one every sixth cell,
+     which is what makes it read as drawing paper instead of a table. */
+  --nf-grid-fine: rgb(18 87 201 / 0.07);
+  --nf-grid-bold: rgb(18 87 201 / 0.13);
+  --nf-grid-cell: 18px;
+  --nf-grid-major: 108px;
+
+  --nf-ink: #0b1f3f;
+  --nf-rule: var(--vk-color-border);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"] {
+  --vk-color-primary: #5aa2ff;
+  --vk-color-primary-hover: #7db6ff;
+  --vk-color-primary-active: #4890ee;
+  --vk-color-primary-subtle: #102a4d;
+  --vk-color-primary-subtle-fg: #9cc6ff;
+  --vk-color-ring: #5aa2ff;
+
+  /* The logo keeps white ink on a blue tile in both themes, but the tile lifts
+     on dark so it sits in the same blue family as the rest of the dark UI
+     instead of reading as a muddy patch. 4.1:1 against the glyph — above the
+     3:1 WCAG 1.4.11 floor for non-text contrast. */
+  --nf-logo-tile: #2f7bea;
+
+  --nf-grid-fine: rgb(120 170 255 / 0.07);
+  --nf-grid-bold: rgb(120 170 255 / 0.13);
+  --nf-ink: #dce7f7;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ------------------------------------------------------------------ base */
+
+html {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-family: var(--vk-font-sans);
+  color: var(--vk-color-fg);
+  background: var(--vk-color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The page's main column grows so the footer sits at the bottom of a short page. */
+.nf-main {
+  flex: 1;
+}
+
+/* Keyboard-only escape from the navbar. Visible the moment it takes focus. */
+.nf-skip {
+  position: absolute;
+  inset-inline-start: var(--vk-space-4);
+  inset-block-start: calc(var(--vk-space-4) * -8);
+  z-index: 100;
+  padding: var(--vk-space-2) var(--vk-space-4);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-primary);
+  color: var(--vk-color-primary-fg);
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-semibold);
+  text-decoration: none;
+  transition: inset-block-start var(--vk-duration-fast) var(--vk-ease);
+}
+
+.nf-skip:focus-visible {
+  inset-block-start: var(--vk-space-4);
+}
+
+/*
+ * The default 18px thumb is under the 24px WCAG 2.5.8 target minimum, and sliders
+ * are the primary control on this site — budget, price range, all three EMI
+ * inputs. The token has to be set on `.vk-slider` itself: the library declares it
+ * there, and a value on the element always beats one inherited from `:root`,
+ * whatever the selector specificity.
+ */
+.vk-slider {
+  --vk-slider-thumb: 1.5rem;
+}
+
+/* ----------------------------------------------------------------- logo */
+
+.nf-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  color: inherit;
+  text-decoration: none;
+}
+
+.nf-logo svg {
+  flex: none;
+}
+
+.nf-logo-word {
+  font-size: var(--vk-text-lg);
+  font-weight: var(--vk-weight-bold);
+  letter-spacing: var(--vk-tracking-tight);
+  line-height: var(--vk-leading-none);
+}
+
+/* --------------------------------------------------------- repo controls */
+
+/* "Clone" in the header. Sized like the theme toggle beside it so the actions
+   row reads as one group rather than a link wedged next to two buttons. */
+.nf-repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  padding-inline: var(--vk-space-3);
+  block-size: var(--vk-space-8);
+  border: 1px solid var(--nf-rule);
+  border-radius: var(--vk-radius-md);
+  color: var(--vk-color-fg);
+  background: var(--vk-color-surface);
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--vk-duration) var(--vk-ease),
+    border-color var(--vk-duration) var(--vk-ease);
+}
+
+.nf-repo-link:hover {
+  background: var(--vk-color-surface-hover);
+  border-color: var(--vk-color-border-strong);
+}
+
+.nf-repo-link svg {
+  flex: none;
+}
+
+/* The badge is a link; 22px left it just under the 24px target minimum. */
+.nf-navbar-badge {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+/*
+ * Below the navbar's own collapse width the bar has to hold the brand, the
+ * hamburger, the theme toggle and this — so the promo badge goes first and the
+ * clone control drops to its icon. The accessible name is on the anchor, so
+ * hiding the visible word costs nothing to a screen reader.
+ */
+@media (max-width: 60rem) {
+  .nf-navbar-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 30rem) {
+  .nf-repo-link-label {
+    display: none;
+  }
+
+  .nf-repo-link {
+    padding-inline: var(--vk-space-2);
+  }
+}
+
+/* ------------------------------------------------------- signature: grid */
+
+/*
+ * The blueprint field. Used behind the hero and behind every standalone price
+ * block — the two places where a real-estate site is showing you a measurement.
+ */
+.nf-blueprint {
+  position: relative;
+  background-color: var(--vk-color-surface-subtle);
+  background-image:
+    linear-gradient(to right, var(--nf-grid-fine) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nf-grid-fine) 1px, transparent 1px),
+    linear-gradient(to right, var(--nf-grid-bold) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nf-grid-bold) 1px, transparent 1px);
+  background-size:
+    var(--nf-grid-cell) var(--nf-grid-cell),
+    var(--nf-grid-cell) var(--nf-grid-cell),
+    var(--nf-grid-major) var(--nf-grid-major),
+    var(--nf-grid-major) var(--nf-grid-major);
+  background-position: center;
+}
+
+/* Fades the grid out at the bottom edge so it does not collide with the next section. */
+.nf-blueprint-fade::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 40%;
+  background: linear-gradient(to bottom, transparent, var(--vk-color-bg));
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------ signature: price */
+
+/*
+ * Tabular figures, everywhere a rupee value appears.
+ *
+ * Proportional digits make a column of prices ragged and genuinely harder to
+ * compare — a 1 is half the width of a 4. `tnum` fixes the advance width so
+ * ₹1.23 Cr and ₹4.65 Cr occupy the same space and the decimal points line up.
+ */
+.nf-price,
+.nf-figure {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1;
+  letter-spacing: var(--vk-tracking-tight);
+}
+
+.nf-price {
+  font-weight: var(--vk-weight-bold);
+  color: var(--vk-color-fg);
+  line-height: var(--vk-leading-none);
+}
+
+.nf-price-lg {
+  font-size: var(--vk-text-2xl);
+}
+
+.nf-price-xl {
+  font-size: var(--vk-text-3xl);
+}
+
+.nf-price-unit {
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-medium);
+  color: var(--vk-color-muted);
+  letter-spacing: 0;
+}
+
+/* A price sitting on its own square of drafting paper. */
+.nf-price-plate {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--vk-space-1);
+  padding: var(--vk-space-3) var(--vk-space-4);
+  border: 1px solid var(--nf-rule);
+  border-radius: var(--vk-radius-md);
+  background-color: var(--vk-color-surface);
+  background-image:
+    linear-gradient(to right, var(--nf-grid-fine) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nf-grid-fine) 1px, transparent 1px);
+  background-size: var(--nf-grid-cell) var(--nf-grid-cell);
+}
+
+/* ------------------------------------------------------------- listings */
+
+/* Beds · Baths · Area, separated by real middots rather than pipes. */
+.nf-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vk-space-2);
+  margin: 0;
+  font-size: var(--vk-text-sm);
+  color: var(--vk-color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.nf-meta > * + *::before {
+  content: "·";
+  margin-inline-end: var(--vk-space-2);
+  color: var(--vk-color-border-strong);
+}
+
+.nf-meta-item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* The image at the top of a listing card. Fixed ratio, so nothing shifts on load. */
+.nf-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--vk-color-surface-sunken);
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+
+.nf-card-media img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform var(--vk-duration-slow) var(--vk-ease-out);
+}
+
+.nf-card:hover .nf-card-media img {
+  transform: scale(1.03);
+}
+
+/* Badges float over the photo, top-left; the save button sits top-right. */
+.nf-card-tags {
+  position: absolute;
+  inset-block-start: var(--vk-space-3);
+  inset-inline-start: var(--vk-space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vk-space-2);
+  z-index: 1;
+}
+
+.nf-card-save {
+  position: absolute;
+  inset-block-start: var(--vk-space-2);
+  inset-inline-end: var(--vk-space-2);
+  z-index: 1;
+}
+
+.nf-card {
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/*
+ * The card itself is `padding="none"` so the photo can run edge to edge; the
+ * body puts the inset back, or the price and title sit hard against the border.
+ */
+.nf-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vk-space-2);
+  flex: 1;
+  padding: var(--vk-space-4);
+}
+
+/* Stretches the title link over the whole card without nesting interactive elements. */
+.nf-stretch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.nf-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nf-card-link:hover {
+  color: var(--vk-color-primary);
+}
+
+/* --------------------------------------------------------------- layouts */
+
+/* Filter rail beside results. Stacks under 60rem, where a sidebar stops working. */
+/*
+ * `minmax(0, 1fr)` on the single-column case is load-bearing. A bare `display:
+ * grid` gives an implicit `auto` track whose minimum is the content's
+ * *min-content* width — so one stubborn descendant drags the track wider than
+ * the viewport and the whole page scrolls sideways. A zero minimum forbids that.
+ */
+.nf-results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--vk-space-8);
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .nf-results {
+    grid-template-columns: 17rem minmax(0, 1fr);
+  }
+
+  .nf-rail {
+    position: sticky;
+    inset-block-start: var(--vk-space-6);
+    max-block-size: calc(100dvh - var(--vk-space-12));
+    overflow-y: auto;
+  }
+}
+
+/* The two-column split on a listing page: gallery and body, then a sticky aside. */
+.nf-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--vk-space-8);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .nf-detail {
+    grid-template-columns: minmax(0, 1fr) 21rem;
+  }
+
+  .nf-aside {
+    position: sticky;
+    inset-block-start: var(--vk-space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--vk-space-4);
+  }
+}
+
+/* Key facts under the gallery: label above value, wrapping as it needs to. */
+.nf-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+  gap: var(--vk-space-4) var(--vk-space-6);
+  margin: 0;
+  padding: var(--vk-space-5) 0;
+  border-block: 1px solid var(--nf-rule);
+}
+
+.nf-fact dt {
+  font-size: var(--vk-text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--vk-tracking-wide);
+  color: var(--vk-color-muted);
+  margin-block-end: var(--vk-space-1);
+}
+
+.nf-fact dd {
+  margin: 0;
+  font-size: var(--vk-text-md);
+  font-weight: var(--vk-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Paragraph rhythm inside Prose.
+ *
+ * The library sets `.vk-prose > * + * { margin-block-start }` and then, later in
+ * the same stylesheet, `.vk-prose p { margin-block: 0 }`. Both are wrapped in
+ * `:where()`, so both have specificity zero and the later one wins — which
+ * leaves consecutive paragraphs with no gap at all. One flat class outranks both.
+ */
+.nf-prose > * + * {
+  margin-block-start: var(--vk-space-4);
+}
+
+/* --------------------------------------------------------------- charts */
+
+/*
+ * Every chart renders a visually hidden `<table>` of its real numbers for screen
+ * readers. The library hides it with `inline-size: 1px; overflow: hidden`, but a
+ * CSS table box refuses to be narrower than its own min-content — so the box
+ * stayed ~390px wide, and being absolutely positioned it extended the page's
+ * scrollable area and made the listing pages scroll sideways.
+ *
+ * Clipping at the chart root contains it. `clip` rather than `hidden` so no
+ * scroll container is created, and the table keeps its markup and its place in
+ * the accessibility tree, which is the part that matters.
+ */
+.vk-chart {
+  overflow: clip;
+}
+
+
+/* The one-line reading of the chart above it. */
+.nf-takeaway {
+  display: flex;
+  align-items: baseline;
+  gap: var(--vk-space-2);
+  margin-block-start: var(--vk-space-3);
+  padding-block-start: var(--vk-space-3);
+  border-block-start: 1px solid var(--nf-rule);
+  font-size: var(--vk-text-sm);
+  color: var(--vk-color-muted);
+}
+
+.nf-takeaway strong {
+  font-size: var(--vk-text-lg);
+  font-weight: var(--vk-weight-bold);
+  color: var(--vk-color-success);
+  font-variant-numeric: tabular-nums;
+}
+
+.nf-takeaway strong[data-trend="down"] {
+  color: var(--vk-color-danger);
+}
+
+/* -------------------------------------------------------------- gallery */
+
+.nf-gallery-frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--vk-radius-lg);
+  background: var(--vk-color-surface-sunken);
+}
+
+.nf-gallery-frame img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.nf-gallery-caption {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding: var(--vk-space-6) var(--vk-space-4) var(--vk-space-3);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent);
+  color: #fff;
+  font-size: var(--vk-text-sm);
+  font-weight: var(--vk-weight-medium);
+}
+
+/* --------------------------------------------------------------- footer */
+
+/*
+ * A shell command with a copy button beside it.
+ *
+ * The `<code>` is the visible box — the wrapper is transparent, so there is no
+ * nested-rectangle look from two backgrounds stacking.
+ *
+ * The clone URL is longer than a phone is wide, so it wraps rather than scrolls.
+ * That is deliberate: a horizontally scrollable box is a scroll region, and a
+ * scroll region with no focusable content cannot be reached by keyboard at all
+ * — axe flags it as a serious failure, and it is one. Wrapping costs a line of
+ * height and nothing else; the copy button is the real affordance.
+ */
+.nf-install {
+  display: flex;
+  align-items: center;
+  gap: var(--vk-space-2);
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.nf-install code {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding: var(--vk-space-2) var(--vk-space-3);
+  border: 1px solid var(--nf-rule);
+  border-radius: var(--vk-radius-md);
+  background: var(--vk-color-surface-subtle);
+  font-size: var(--vk-text-sm);
+  line-height: var(--vk-leading-snug);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ----------------------------------------------------------- utilities */
+
+.nf-hairline {
+  border: 0;
+  border-block-start: 1px solid var(--nf-rule);
+  margin: 0;
+}
+
+/* Screen-reader-only, the version that survives being focused. */
+.nf-sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Figures in the compare table are for comparing — wrapping "₹1.54 Cr" over two
+   lines defeats the tabular alignment they are set in. */
+.nf-nowrap {
+  white-space: nowrap;
+}
+
+.nf-scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+/*
+ * A four-step horizontal Stepper needs ~326px of track and was pushing the whole
+ * page sideways below 390px. These rules restate the library's own
+ * `data-orientation="vertical"` geometry — same tokens, so it stays in step —
+ * rather than forcing a horizontal scroller onto a four-item indicator.
+ */
+@media (max-width: 34rem) {
+  .nf-steps .vk-stepper__list {
+    flex-direction: column;
+  }
+
+  .nf-steps .vk-stepper__item {
+    flex: none;
+  }
+
+  .nf-steps .vk-stepper__text {
+    padding-block-start: 0;
+  }
+
+  .nf-steps .vk-stepper__item::before {
+    inline-size: var(--vk-stepper-rail);
+    block-size: calc(100% - var(--vk-stepper-marker) - var(--vk-space-1) + var(--vk-stepper-gap));
+    inset-block-start: calc(var(--vk-stepper-marker) + var(--vk-space-1));
+    inset-inline-start: calc((var(--vk-stepper-marker) - var(--vk-stepper-rail)) / 2);
+  }
+}
+
+/* A link that is the whole paragraph is not an inline target, so it needs to
+   meet the 24px minimum on its own. */
+.nf-textlink {
+  display: inline-block;
+  padding-block: var(--vk-space-1);
+}
+
+/* Text links sized for a finger as well as a cursor (WCAG 2.5.8). */
+.vk-footer__link,
+.vk-breadcrumb__link {
+  display: inline-block;
+  padding-block: var(--vk-space-1);
+}
+
+/* --------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
+
+  .nf-card:hover .nf-card-media img {
+    transform: none;
+  }
 }
