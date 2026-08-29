@@ -317,7 +317,7 @@ export function ListingsBrowser({
                 <Field label="Keywords" help="Press Enter after each. All must match.">
                   <TagInput
                     value={keywords}
-                    onChange={reset(setKeywords)}
+                    onValueChange={reset(setKeywords)}
                     placeholder="metro, lake, terrace…"
                     max={6}
                     size="sm"
