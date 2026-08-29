@@ -240,7 +240,7 @@ export default function HomePage() {
         eyebrow="FAQ"
         title="Questions worth answering honestly"
         headingLevel={2}
-        defaultOpen={0}
+        defaultOpenIndex={0}
         items={faqs.map((faq) => ({ id: faq.id, question: faq.question, answer: faq.answer }))}
       />
 
@@ -248,7 +248,7 @@ export default function HomePage() {
       <CTA
         padding="xl"
         size="lg"
-        variant="primary"
+        background="primary"
         title="List your property"
         description="On the real thing this would open a form. Here it is a link to the source, which is arguably more useful."
         actions={

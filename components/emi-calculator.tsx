@@ -121,7 +121,7 @@ export function EmiCalculator({ price }: { price: number }) {
             <PieChart
               donut
               innerRadius={0.62}
-              size={240}
+              diameter={240}
               data={[
                 { label: 'Principal', value: emi.principal },
                 { label: 'Interest', value: emi.totalInterest },
